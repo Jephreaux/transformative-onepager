@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Transformative — system architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    background:#EFE8DA; color:#2A2722;
+    font-family:'Hanken Grotesk',-apple-system,system-ui,sans-serif;
+    display:flex; flex-direction:column;
+  }
+  header{padding:16px 18px 12px;}
+  .eyebrow{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#15705A; font-weight:600; margin-bottom:6px;}
+  h1{font-family:'Fraunces',serif; font-size:21px; line-height:1.2; font-weight:500; color:#23201B; margin:0;}
+  .lede{font-size:13px; line-height:1.5; color:#6B6459; margin:7px 0 0; max-width:60ch;}
+
+  --paper:#F4EEE2;
+  .stage-wrap{flex:1; position:relative; margin:0 12px 12px; border:1px solid #C9BFA8; border-radius:14px; overflow:hidden; background:#F4EEE2;}
+  .stage{
+    width:100%; height:100%; overflow:hidden; cursor:grab; touch-action:none;
+    background:radial-gradient(circle at 1px 1px, rgba(0,0,0,.04) 1px, transparent 0);
+    background-size:22px 22px;
+  }
+  .stage.grab{cursor:grabbing;}
+  .inner{transform-origin:0 0; will-change:transform;}
+  .ctrls{position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:5;}
+  .ctrls button{
+    width:38px; height:38px; border-radius:9px; border:1px solid #C9BFA8;
+    background:#FBF7EE; color:#2C2A24; font-size:18px; line-height:1; cursor:pointer;
+    font-family:inherit; box-shadow:0 1px 2px rgba(0,0,0,.08);
+  }
+  .ctrls button:active{background:#E4EADf;}
+  .ctrls .reset{width:auto; padding:0 12px; font-size:12px; font-weight:600;}
+  .hint{
+    position:absolute; bottom:10px; left:12px; z-index:5; font-size:11px; color:#6B6657;
+    background:rgba(251,247,238,.85); padding:4px 9px; border-radius:7px; border:1px solid #C9BFA8;
+  }
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+  .t-band{font:600 13px 'Fraunces',serif; fill:#6B6657; letter-spacing:.08em; text-transform:uppercase;}
+  .t-title{font:600 15px 'Fraunces',serif; fill:#2C2A24;}
+  .t-sub{font:500 11.5px 'Hanken Grotesk',sans-serif; fill:#6B6657;}
+  .t-chip{font:600 11px 'Hanken Grotesk',sans-serif; fill:#2C2A24;}
+  .t-edge{font:600 10.5px 'Hanken Grotesk',sans-serif; fill:#6B6657;}
+  .t-tag{font:700 9.5px 'Hanken Grotesk',sans-serif; letter-spacing:.04em;}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">Transformative · system architecture</div>
+  <h1>How the pieces fit together</h1>
+  <p class="lede">Everything green lives inside Google's HIPAA boundary. Drag to move · pinch or use +/&minus; to zoom.</p>
+</header>
+
+<div class="stage-wrap">
+  <div class="ctrls">
+    <button class="zin" aria-label="Zoom in">+</button>
+    <button class="zout" aria-label="Zoom out">&minus;</button>
+    <button class="reset" aria-label="Reset view">Reset</button>
+  </div>
+  <div class="hint">Drag · pinch to zoom</div>
+  <div class="stage">
+    <div class="inner">
+      <h2 class="sr-only">Architecture diagram: a Google Workspace build inside the HIPAA BAA boundary. People interact through one role-based AppSheet app over an Apps Script logic layer and a Google Sheets data layer. SimplePractice and Claude sit outside the boundary. Three views: matching engine, intake-funnel analytics, referring-provider intelligence.</h2>
+      <svg width="1180" height="1260" viewBox="0 0 1180 1260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Transformative Clinic architecture diagram">
+        <defs>
+          <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#7A7460"/></marker>
+          <marker id="arrG" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#33503F"/></marker>
+          <marker id="arrClay" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#B05A36"/></marker>
+        </defs>
+
+        <text x="40" y="40" class="t-band">People</text>
+        <g>
+          <rect x="40" y="54" width="200" height="70" rx="12" fill="#FBF7EE" stroke="#C9BFA8"/>
+          <text x="60" y="84" class="t-title">Patient</text>
+          <text x="60" y="104" class="t-sub">submits intake form</text>
+        </g>
+        <g>
+          <rect x="470" y="54" width="230" height="70" rx="12" fill="#FBF7EE" stroke="#C9BFA8"/>
+          <text x="490" y="84" class="t-title">Intake Coordinator</text>
+          <text x="490" y="104" class="t-sub">picks the match · logs referrals</text>
+        </g>
+        <g>
+          <rect x="900" y="54" width="240" height="70" rx="12" fill="#FBF7EE" stroke="#B6883C" stroke-width="1.5"/>
+          <text x="920" y="84" class="t-title">Owner · Tracy</text>
+          <text x="920" y="104" class="t-sub">reads the analytics</text>
+          <rect x="1086" y="62" width="46" height="17" rx="8" fill="#F1E6CB"/>
+          <text x="1093" y="74" class="t-tag" fill="#B6883C">OWNER</text>
+        </g>
+
+        <rect x="28" y="156" width="838" height="1064" rx="18" fill="#EFE8D8" stroke="#33503F" stroke-width="1.6"/>
+        <rect x="44" y="170" width="320" height="26" rx="13" fill="#33503F"/>
+        <text x="58" y="188" class="t-tag" fill="#F4EEE2" style="letter-spacing:.06em">HIPAA BAA BOUNDARY · GOOGLE WORKSPACE</text>
+
+        <text x="56" y="232" class="t-band">UI Layer — one AppSheet app, role-based</text>
+        <rect x="56" y="246" width="782" height="180" rx="14" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="76" y="274" class="t-title">AppSheet</text>
+        <text x="76" y="293" class="t-sub">no-code · staff-maintainable · AI features OFF</text>
+
+        <rect x="76" y="306" width="360" height="104" rx="11" fill="#E4EADf" stroke="#5E7A68"/>
+        <text x="92" y="330" class="t-chip" style="font-size:12px;fill:#33503F">Coordinator role</text>
+        <rect x="92" y="342" width="150" height="26" rx="7" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="104" y="359" class="t-chip">Matching view</text>
+        <rect x="252" y="342" width="166" height="26" rx="7" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="264" y="359" class="t-chip">Referral entry</text>
+        <rect x="92" y="374" width="150" height="26" rx="7" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="104" y="391" class="t-chip">Disposition</text>
+        <rect x="252" y="374" width="166" height="26" rx="7" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="264" y="391" class="t-chip">Provider registry edit</text>
+
+        <rect x="458" y="306" width="360" height="104" rx="11" fill="#F1E6CB" stroke="#B6883C"/>
+        <text x="474" y="330" class="t-chip" style="font-size:12px;fill:#8A6420">Owner role — + dashboards</text>
+        <rect x="474" y="342" width="158" height="26" rx="7" fill="#FBF7EE" stroke="#D9C58E"/>
+        <text x="486" y="359" class="t-chip">Funnel conversion</text>
+        <rect x="642" y="342" width="160" height="26" rx="7" fill="#FBF7EE" stroke="#D9C58E"/>
+        <text x="654" y="359" class="t-chip">Referrer conversion</text>
+        <rect x="474" y="374" width="158" height="26" rx="7" fill="#FBF7EE" stroke="#D9C58E"/>
+        <text x="486" y="391" class="t-chip">Utilization*</text>
+        <rect x="642" y="374" width="160" height="26" rx="7" fill="#FBF7EE" stroke="#D9C58E"/>
+        <text x="654" y="391" class="t-chip">Aggregate · low PHI</text>
+
+        <text x="56" y="468" class="t-band">Logic Layer — Apps Script (thin glue, owner + Claude only)</text>
+        <rect x="56" y="482" width="782" height="96" rx="14" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <rect x="76" y="500" width="172" height="60" rx="9" fill="#E4EADf" stroke="#5E7A68"/>
+        <text x="92" y="524" class="t-chip" style="fill:#33503F">Matching engine</text>
+        <text x="92" y="542" class="t-edge">filter + surfacer</text>
+        <rect x="262" y="500" width="172" height="60" rx="9" fill="#E4EADf" stroke="#5E7A68"/>
+        <text x="278" y="524" class="t-chip" style="fill:#33503F">Disposition sync</text>
+        <text x="278" y="542" class="t-edge">15-min trigger</text>
+        <rect x="448" y="500" width="172" height="60" rx="9" fill="#E4EADf" stroke="#5E7A68"/>
+        <text x="464" y="524" class="t-chip" style="fill:#33503F">Notifications</text>
+        <text x="464" y="542" class="t-edge">decline loop · templates</text>
+        <rect x="634" y="500" width="184" height="60" rx="9" fill="#E4EADf" stroke="#5E7A68"/>
+        <text x="650" y="524" class="t-chip" style="fill:#33503F">Weekly brief</text>
+        <text x="650" y="542" class="t-edge">nurture + funnel email</text>
+
+        <text x="56" y="620" class="t-band">Data Layer — Google Sheets (system of record for the build)</text>
+        <g>
+          <rect x="56" y="636" width="240" height="64" rx="11" fill="#E4EADf" stroke="#5E7A68"/>
+          <text x="74" y="662" class="t-title" style="font-size:14px">Google Form</text>
+          <text x="74" y="681" class="t-sub">intake — Tracy built it</text>
+        </g>
+        <rect x="56" y="724" width="240" height="64" rx="11" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="74" y="750" class="t-title" style="font-size:14px">Intake Sheet</text>
+        <text x="74" y="769" class="t-sub">the spine · one record</text>
+        <rect x="312" y="724" width="240" height="64" rx="11" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="330" y="750" class="t-title" style="font-size:14px">Referral Sheet</text>
+        <text x="330" y="769" class="t-sub">referrer · disposition · dates</text>
+        <rect x="568" y="724" width="250" height="64" rx="11" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="586" y="750" class="t-title" style="font-size:14px">Provider Registry</text>
+        <text x="586" y="769" class="t-sub">rules: insurance · age · "no"</text>
+        <rect x="56" y="804" width="240" height="64" rx="11" fill="#FBF7EE" stroke="#C9BFA8"/>
+        <text x="74" y="830" class="t-title" style="font-size:14px">Referring-Provider Reg</text>
+        <text x="74" y="849" class="t-sub">canonical names + aliases</text>
+        <rect x="312" y="804" width="240" height="64" rx="11" fill="#F1E6CB" stroke="#B6883C"/>
+        <text x="330" y="830" class="t-title" style="font-size:14px">CONFIG</text>
+        <text x="330" y="849" class="t-sub">staff-editable rules + templates</text>
+        <rect x="568" y="804" width="250" height="64" rx="11" fill="#F1E6CB" stroke="#B6883C"/>
+        <text x="586" y="830" class="t-title" style="font-size:14px">Command Center</text>
+        <text x="586" y="849" class="t-sub">IMPORTRANGE · read-only · aggregate</text>
+
+        <text x="56" y="912" class="t-band">Three views of one record</text>
+        <rect x="56" y="926" width="250" height="60" rx="11" fill="#FBF7EE" stroke="#5E7A68"/>
+        <text x="72" y="950" class="t-chip" style="font-size:12px;fill:#33503F">1 · Matching engine</text>
+        <text x="72" y="968" class="t-edge">flagship — makes it great</text>
+        <rect x="322" y="926" width="250" height="60" rx="11" fill="#FBF7EE" stroke="#5E7A68"/>
+        <text x="338" y="950" class="t-chip" style="font-size:12px;fill:#33503F">2 · Intake analytics</text>
+        <text x="338" y="968" class="t-edge">funnel + conversion — drives it</text>
+        <rect x="588" y="926" width="250" height="60" rx="11" fill="#FBF7EE" stroke="#5E7A68"/>
+        <text x="604" y="950" class="t-chip" style="font-size:12px;fill:#33503F">3 · Referral intel</text>
+        <text x="604" y="968" class="t-edge">conversion by referrer — epic</text>
+
+        <rect x="892" y="156" width="262" height="700" rx="18" fill="#F6EAE2" stroke="#B05A36" stroke-width="1.6" stroke-dasharray="7 5"/>
+        <rect x="908" y="170" width="190" height="26" rx="13" fill="#B05A36"/>
+        <text x="922" y="188" class="t-tag" fill="#F6EAE2" style="letter-spacing:.06em">OUTSIDE THE BAA BOUNDARY</text>
+        <rect x="908" y="246" width="230" height="118" rx="13" fill="#FBF7EE" stroke="#B05A36"/>
+        <text x="926" y="274" class="t-title">SimplePractice</text>
+        <text x="926" y="293" class="t-sub">EHR · scheduling · billing</text>
+        <rect x="926" y="306" width="186" height="42" rx="8" fill="#F0DCCF" stroke="#D7A98C"/>
+        <text x="940" y="324" class="t-chip" style="fill:#8A3F1E">Utilization / revenue</text>
+        <text x="940" y="340" class="t-edge" style="fill:#8A3F1E">Phase 4 — gated on data-out</text>
+        <rect x="908" y="404" width="230" height="118" rx="13" fill="#FBF7EE" stroke="#B05A36"/>
+        <text x="926" y="432" class="t-title">Claude</text>
+        <text x="926" y="451" class="t-sub">build-time only</text>
+        <rect x="926" y="464" width="186" height="42" rx="8" fill="#F0DCCF" stroke="#D7A98C"/>
+        <text x="940" y="482" class="t-chip" style="fill:#8A3F1E">Synthetic data only</text>
+        <text x="940" y="498" class="t-edge" style="fill:#8A3F1E">NO PHI, ever</text>
+
+        <path d="M140,124 L140,170 Q140,180 150,636" fill="none" stroke="#33503F" stroke-width="1.6" marker-end="url(#arrG)"/>
+        <text x="150" y="200" class="t-edge">submits</text>
+        <path d="M176,700 L176,724" fill="none" stroke="#33503F" stroke-width="1.6" marker-end="url(#arrG)"/>
+        <text x="186" y="717" class="t-edge">onFormSubmit</text>
+        <path d="M150,560 L150,636" fill="none" stroke="#7A7460" stroke-width="1.3" marker-end="url(#arr)"/>
+        <path d="M585,124 Q585,180 470,300" fill="none" stroke="#7A7460" stroke-width="1.4" marker-end="url(#arr)"/>
+        <text x="470" y="150" class="t-edge">works in</text>
+        <path d="M1010,124 Q1010,210 818,330" fill="none" stroke="#B6883C" stroke-width="1.6" marker-end="url(#arr)"/>
+        <text x="905" y="150" class="t-edge" style="fill:#B6883C">reads</text>
+        <path d="M447,426 L447,482" fill="none" stroke="#7A7460" stroke-width="1.4" marker-end="url(#arr)"/>
+        <path d="M300,578 L250,724" fill="none" stroke="#7A7460" stroke-width="1.4" marker-end="url(#arr)"/>
+        <path d="M296,756 L312,756" fill="none" stroke="#7A7460" stroke-width="1.4" marker-end="url(#arr)"/>
+        <text x="250" y="715" class="t-edge">referral_id</text>
+        <path d="M430,788 Q500,796 568,820" fill="none" stroke="#7A7460" stroke-width="1.3" marker-end="url(#arr)"/>
+        <path d="M693,804 Q693,640 690,410" fill="none" stroke="#B6883C" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrG)"/>
+        <text x="700" y="640" class="t-edge" style="fill:#B6883C">feeds dashboards</text>
+        <path d="M908,330 Q860,330 818,360" fill="none" stroke="#B05A36" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arrClay)"/>
+        <text x="828" y="318" class="t-edge" style="fill:#8A3F1E">CSV / API*</text>
+        <path d="M908,463 Q860,463 838,520" fill="none" stroke="#B05A36" stroke-width="1.4" stroke-dasharray="6 4" marker-end="url(#arrClay)"/>
+        <text x="826" y="455" class="t-edge" style="fill:#8A3F1E">builds (synthetic)</text>
+
+        <text x="56" y="1030" class="t-band">Legend</text>
+        <rect x="56" y="1044" width="18" height="18" rx="5" fill="#E4EADf" stroke="#5E7A68"/>
+        <text x="82" y="1058" class="t-chip">Google-native — inside BAA</text>
+        <rect x="320" y="1044" width="18" height="18" rx="5" fill="#F1E6CB" stroke="#B6883C"/>
+        <text x="346" y="1058" class="t-chip">Owner / config surface</text>
+        <rect x="560" y="1044" width="18" height="18" rx="5" fill="#F6EAE2" stroke="#B05A36" stroke-dasharray="4 3"/>
+        <text x="586" y="1058" class="t-chip">Outside BAA — gated / build-only</text>
+        <text x="56" y="1092" class="t-edge">* Utilization &amp; revenue analytics need SimplePractice data-out (API vs CSV) confirmed first — Phase 4, the only blocked track.</text>
+        <text x="56" y="1112" class="t-edge">Matching engine never auto-decides or auto-books — it surfaces an eligible shortlist; the coordinator always picks.</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const stage=document.querySelector('.stage');
+  const inner=document.querySelector('.inner');
+  const W=1180,H=1260;
+  let scale=1,tx=0,ty=0,fit=1;
+
+  function fitView(){
+    const r=stage.getBoundingClientRect();
+    fit=Math.min(r.width/W, r.height/H);
+    scale=fit; tx=(r.width-W*scale)/2; ty=(r.height-H*scale)/2; apply();
+  }
+  function apply(){ inner.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`; }
+  function clampScale(s){ return Math.min(Math.max(s, fit*0.7), fit*6); }
+  function zoomAt(cx,cy,factor){
+    const ns=clampScale(scale*factor), k=ns/scale;
+    tx=cx-(cx-tx)*k; ty=cy-(cy-ty)*k; scale=ns; apply();
+  }
+
+  // wheel (desktop)
+  stage.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const r=stage.getBoundingClientRect();
+    zoomAt(e.clientX-r.left,e.clientY-r.top, e.deltaY<0?1.12:1/1.12);
+  },{passive:false});
+
+  // pointer tracking (drag + pinch)
+  const pts=new Map();
+  let pinchPrev=0, pinchMid=null;
+  stage.addEventListener('pointerdown',e=>{
+    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    stage.setPointerCapture(e.pointerId);
+    stage.classList.add('grab');
+  });
+  stage.addEventListener('pointermove',e=>{
+    if(!pts.has(e.pointerId))return;
+    const prev=pts.get(e.pointerId);
+    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    const r=stage.getBoundingClientRect();
+    if(pts.size===1){
+      tx+=e.clientX-prev.x; ty+=e.clientY-prev.y; apply();
+    } else if(pts.size===2){
+      const a=[...pts.values()];
+      const dist=Math.hypot(a[0].x-a[1].x, a[0].y-a[1].y);
+      const mid={x:(a[0].x+a[1].x)/2-r.left, y:(a[0].y+a[1].y)/2-r.top};
+      if(pinchPrev){ zoomAt(mid.x,mid.y, dist/pinchPrev); }
+      pinchPrev=dist; pinchMid=mid;
+    }
+  });
+  function up(e){
+    pts.delete(e.pointerId);
+    if(pts.size<2) pinchPrev=0;
+    if(pts.size===0) stage.classList.remove('grab');
+  }
+  stage.addEventListener('pointerup',up);
+  stage.addEventListener('pointercancel',up);
+
+  const ctr=()=>{const r=stage.getBoundingClientRect();return[r.width/2,r.height/2];};
+  document.querySelector('.zin').addEventListener('click',()=>{const[a,b]=ctr();zoomAt(a,b,1.3);});
+  document.querySelector('.zout').addEventListener('click',()=>{const[a,b]=ctr();zoomAt(a,b,1/1.3);});
+  document.querySelector('.reset').addEventListener('click',fitView);
+
+  if(window.ResizeObserver){ new ResizeObserver(()=>fitView()).observe(stage); }
+  window.addEventListener('orientationchange',()=>setTimeout(fitView,200));
+  setTimeout(fitView,40);
+})();
+</script>
+</body>
+</html>
