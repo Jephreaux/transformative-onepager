@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Game of Seamus</title>
+<meta name="description" content="A first-person block world. Mine, build, craft, survive the night, and gather the twelve Ember Shards.">
+<meta name="theme-color" content="#0b1020">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' fill='%235a8a3a'/%3E%3Crect y='5' width='16' height='11' fill='%238a5a3a'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%2378b04a'/%3E%3Crect x='9' y='1' width='3' height='2' fill='%2378b04a'/%3E%3Crect x='4' y='8' width='2' height='2' fill='%236a4229'/%3E%3Crect x='11' y='11' width='2' height='2' fill='%236a4229'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root { --font: 'Press Start 2P', 'Courier New', monospace; --panel: rgba(16,16,24,0.92); --border: #3a3a4a; --gold: #ffcf5a; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0b1020; font-family: var(--font); color: #eee; -webkit-user-select: none; user-select: none; touch-action: none; }
+  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; image-rendering: pixelated; }
+  #nogl { display: none; position: fixed; inset: 0; padding: 40px; font-size: 14px; line-height: 1.8; }
+  .hud { position: fixed; pointer-events: none; }
+  #crosshair { left: 50%; top: 50%; width: 22px; height: 22px; transform: translate(-50%,-50%); mix-blend-mode: difference; }
+  #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #fff; }
+  #crosshair::before { left: 50%; top: 0; width: 2px; height: 100%; transform: translateX(-50%); }
+  #crosshair::after { top: 50%; left: 0; height: 2px; width: 100%; transform: translateY(-50%); }
+  #crosshair.hot::before, #crosshair.hot::after { background: #ff6a6a; }
+  #vignette { inset: 0; background: radial-gradient(ellipse at center, rgba(255,0,0,0) 45%, rgba(200,0,0,0.75) 100%); opacity: 0; transition: opacity 0.25s; }
+  #vignette.flash { animation: flash 0.5s ease-out; }
+  @keyframes flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+  #water { inset: 0; background: rgba(20,60,160,0.35); opacity: 0; transition: opacity 0.15s; }
+  #top { left: 0; right: 0; top: 0; padding: 12px 14px; display: flex; justify-content: space-between; align-items: flex-start; font-size: 11px; text-shadow: 2px 2px 0 #000; }
+  #top .box { background: rgba(0,0,0,0.35); padding: 8px 10px; border: 2px solid rgba(255,255,255,0.15); border-radius: 4px; line-height: 1.6; }
+  #shards { color: var(--gold); }
+  #compass { display: flex; align-items: center; gap: 10px; }
+  #needle { width: 28px; height: 28px; display: block; transition: transform 0.08s linear; filter: drop-shadow(1px 1px 0 #000); }
+  #bottom { left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; padding-bottom: max(10px, env(safe-area-inset-bottom)); gap: 6px; }
+  #hearts { font-size: 20px; letter-spacing: 1px; text-shadow: 2px 2px 0 #000; height: 24px; }
+  #hearts .full { color: #ff2d2d; } #hearts .half { color: #ff2d2d; opacity: 0.55; } #hearts .empty { color: #3a1010; }
+  #selname { font-size: 10px; color: #fff; text-shadow: 2px 2px 0 #000; height: 12px; }
+  #hotbar { display: flex; gap: 2px; pointer-events: auto; background: rgba(0,0,0,0.45); padding: 3px; border: 2px solid rgba(255,255,255,0.2); border-radius: 4px; }
+  .slot { width: 48px; height: 48px; border: 2px solid rgba(255,255,255,0.18); position: relative; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); }
+  .slot.sel { border-color: #fff; box-shadow: 0 0 0 2px #000 inset; background: rgba(255,255,255,0.12); }
+  .slot canvas { image-rendering: pixelated; }
+  .count { position: absolute; right: 3px; bottom: 2px; font-size: 9px; color: #fff; text-shadow: 1px 1px 0 #000; }
+  #msg { left: 50%; bottom: 128px; transform: translateX(-50%); font-size: 12px; color: #fff; text-shadow: 2px 2px 0 #000; opacity: 0; transition: opacity 0.3s; text-align: center; max-width: 90vw; line-height: 1.6; }
+  #msg.show { opacity: 1; }
+  #fps { right: 12px; bottom: 12px; font-size: 9px; color: #9f9; text-shadow: 1px 1px 0 #000; display: none; }
+  #fps.show { display: block; }
+  .overlay { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(5,6,14,0.72); z-index: 10; backdrop-filter: blur(3px); overflow: auto; }
+  .overlay.open { display: flex; }
+  .panel { background: var(--panel); border: 3px solid var(--border); box-shadow: 0 0 0 3px #000, 8px 8px 0 rgba(0,0,0,0.5); padding: 28px 30px; max-width: 640px; width: calc(100% - 32px); font-size: 11px; line-height: 1.9; text-align: center; }
+  h1 { font-size: 26px; margin: 0 0 6px; color: var(--gold); text-shadow: 4px 4px 0 #000; letter-spacing: 1px; }
+  h1 small { display: block; font-size: 10px; color: #bbb; margin-top: 10px; letter-spacing: 0; }
+  h2 { font-size: 16px; margin: 0 0 12px; color: #fff; text-shadow: 3px 3px 0 #000; }
+  p { margin: 8px 0; color: #ccc; }
+  .btns { display: flex; flex-direction: column; gap: 10px; margin: 18px auto 8px; max-width: 360px; }
+  button { font-family: var(--font); font-size: 11px; padding: 12px 16px; background: #6d6d6d; color: #fff; border: 2px solid #000; box-shadow: inset 2px 2px 0 #aaa, inset -2px -2px 0 #3a3a3a; cursor: pointer; text-shadow: 2px 2px 0 #333; }
+  button:hover { background: #7a8bd8; box-shadow: inset 2px 2px 0 #b6c0f0, inset -2px -2px 0 #3b4a95; }
+  button:active { box-shadow: inset -2px -2px 0 #aaa, inset 2px 2px 0 #3a3a3a; }
+  button:disabled { opacity: 0.45; cursor: default; }
+  button.primary { background: #4c8b3f; box-shadow: inset 2px 2px 0 #8fd07f, inset -2px -2px 0 #2c5a24; }
+  .controls { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; text-align: left; font-size: 9px; color: #bbb; margin: 14px auto 0; max-width: 440px; line-height: 1.8; }
+  .controls b { color: #fff; font-weight: normal; white-space: nowrap; }
+  .savedesc { font-size: 9px; color: #9fb; margin-top: -4px; }
+  .small { font-size: 9px; color: #888; }
+  label.row { display: flex; align-items: center; gap: 10px; justify-content: center; font-size: 9px; color: #bbb; margin-top: 8px; }
+  input[type=range] { width: 160px; }
+  #loading { z-index: 20; }
+  #bar-wrap { width: 100%; height: 18px; border: 2px solid #000; background: #222; margin-top: 12px; box-shadow: inset 0 0 0 2px #444; }
+  #bar { height: 100%; width: 0; background: linear-gradient(#8fd07f, #4c8b3f); transition: width 0.1s; }
+  /* inventory */
+  #inventory { z-index: 8; }
+  #inventory .panel { max-width: 860px; text-align: left; }
+  .invwrap { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 720px) { .invwrap { grid-template-columns: 1fr; } .panel { padding: 18px; } h1 { font-size: 18px; } }
+  #invgrid { display: grid; grid-template-columns: repeat(auto-fill, 74px); gap: 6px; align-content: start; min-height: 80px; }
+  .islot { width: 74px; height: 92px; border: 2px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.3); position: relative; display: flex; flex-direction: column; align-items: center; padding-top: 8px; cursor: pointer; }
+  .islot:hover { background: rgba(255,255,255,0.1); } .islot.sel { border-color: #fff; }
+  .islot .iname { font-size: 7px; color: #ccc; text-align: center; margin-top: 6px; line-height: 1.4; padding: 0 2px; }
+  .islot .count { top: 4px; right: 4px; bottom: auto; }
+  .hint { font-size: 9px; color: #999; grid-column: 1 / -1; }
+  #recipes { display: flex; flex-direction: column; gap: 6px; max-height: 50vh; overflow: auto; }
+  .recipe { display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'n b' 'd b' 'r b'; gap: 2px 12px; padding: 8px 10px; border: 2px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.3); align-items: center; }
+  .recipe.can { border-color: #6fbf5f; } .recipe.done { opacity: 0.5; }
+  .rname { grid-area: n; font-size: 10px; color: #fff; } .rdesc { grid-area: d; font-size: 8px; color: #999; } .rneeds { grid-area: r; font-size: 8px; }
+  .rneeds .ok { color: #8fd07f; } .rneeds .no { color: #e07070; }
+  .recipe button { grid-area: b; font-size: 9px; padding: 8px 10px; }
+  .inv-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  #stats { font-size: 8px; color: #999; margin-top: 12px; }
+  /* touch controls */
+  .tc { display: none; position: fixed; z-index: 5; pointer-events: auto; }
+  body.touch .tc { display: flex; }
+  body.touch #c { cursor: default; }
+  #joy { left: 22px; bottom: 120px; width: 130px; height: 130px; border-radius: 50%; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.3); align-items: center; justify-content: center; }
+  #knob { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.5); border: 2px solid #000; }
+  .tbtn { width: 66px; height: 66px; border-radius: 50%; background: rgba(0,0,0,0.35); border: 2px solid rgba(255,255,255,0.35); color: #fff; font-family: var(--font); font-size: 9px; align-items: center; justify-content: center; text-shadow: 1px 1px 0 #000; }
+  .tbtn:active { background: rgba(255,255,255,0.35); }
+  #t-jump { right: 24px; bottom: 120px; } #t-mine { right: 104px; bottom: 170px; } #t-place { right: 104px; bottom: 90px; } #t-inv { right: 24px; bottom: 210px; width: 50px; height: 50px; }
+  body.touch #hotbar { transform: scale(0.85); transform-origin: bottom center; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="nogl"></div>
+
+<div id="crosshair" class="hud"></div>
+<div id="vignette" class="hud"></div>
+<div id="water" class="hud"></div>
+<div id="top" class="hud">
+  <div class="box"><div id="shards">0 / 12</div><div class="small">Ember Shards</div></div>
+  <div class="box" id="compass"><svg id="needle" viewBox="0 0 24 24" width="28" height="28"><path d="M12 1.5 L19 21 L12 16.5 L5 21 Z" fill="#ffcf5a" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg><div><div id="cdist">—</div><div class="small">nearest shard</div></div></div>
+  <div class="box"><div id="day">Day 1</div><div id="clock" class="small">06:00</div></div>
+</div>
+<div id="msg" class="hud"></div>
+<div id="fps" class="hud"></div>
+<div id="bottom" class="hud">
+  <div id="hearts"></div>
+  <div id="selname"></div>
+  <div id="hotbar"></div>
+</div>
+
+<div id="joy" class="tc"><div id="knob"></div></div>
+<div id="t-jump" class="tc tbtn">JUMP</div>
+<div id="t-mine" class="tc tbtn">MINE</div>
+<div id="t-place" class="tc tbtn">PLACE</div>
+<div id="t-inv" class="tc tbtn">···</div>
+
+<div id="title" class="overlay">
+  <div class="panel">
+    <h1>GAME OF SEAMUS<small>Twelve Ember Shards are hidden across the island.<br>Mine. Build. Craft. Survive the night. Find them all.</small></h1>
+    <div class="btns">
+      <button id="btn-continue" class="primary">Continue World</button>
+      <div id="savedesc" class="savedesc"></div>
+      <button id="btn-new">New World</button>
+    </div>
+    <div class="controls">
+      <b>WASD / Arrows</b><span>Move</span>
+      <b>Mouse</b><span>Look around</span>
+      <b>Left click (hold)</b><span>Mine block · attack Gloom</span>
+      <b>Right click</b><span>Place selected block</span>
+      <b>Space</b><span>Jump · swim up</span>
+      <b>Shift</b><span>Sprint</span>
+      <b>1–9 / Scroll</b><span>Select block</span>
+      <b>E</b><span>Inventory &amp; crafting</span>
+      <b>M / F / Esc</b><span>Mute · FPS · Pause</span>
+    </div>
+    <label class="row">Mouse sensitivity <input id="sens" type="range" min="0" max="1" step="0.01" value="0.4"></label>
+    <p class="small">Works on phones too: joystick to walk, drag to look. Progress saves in this browser.</p>
+  </div>
+</div>
+
+<div id="pause" class="overlay">
+  <div class="panel">
+    <h2>Paused</h2>
+    <p class="small" id="seedlabel"></p>
+    <div class="btns">
+      <button id="btn-resume" class="primary">Back to Game</button>
+      <button id="btn-mute">🔊 Sound on</button>
+      <button id="btn-title">Title Screen</button>
+      <button id="btn-pause-new">Abandon World &amp; Start New</button>
+    </div>
+  </div>
+</div>
+
+<div id="dead" class="overlay">
+  <div class="panel">
+    <h2 style="color:#ff5a5a">You died.</h2>
+    <p>The Gloom got the better of you. Your blocks and shards are safe.</p>
+    <div class="btns"><button id="btn-respawn" class="primary">Respawn</button></div>
+  </div>
+</div>
+
+<div id="win" class="overlay">
+  <div class="panel">
+    <h1>ALL SHARDS FOUND</h1>
+    <p>Seamus, you absolute legend. The island is yours.</p>
+    <p class="small" id="winstats"></p>
+    <div class="btns"><button id="btn-keep" class="primary">Keep Building</button></div>
+  </div>
+</div>
+
+<div id="loading" class="overlay">
+  <div class="panel">
+    <h2>Generating world</h2>
+    <p id="progress" class="small">Shaping the land…</p>
+    <div id="bar-wrap"><div id="bar"></div></div>
+  </div>
+</div>
+
+<div id="inventory" class="overlay">
+  <div class="panel">
+    <div class="inv-head"><h2 style="margin:0">Inventory &amp; Crafting</h2><button id="btn-inv-close">Close (E)</button></div>
+    <div class="invwrap">
+      <div>
+        <p class="small">Click a block to put it in the selected hotbar slot.</p>
+        <div id="invgrid"></div>
+      </div>
+      <div>
+        <p class="small">Recipes</p>
+        <div id="recipes"></div>
+      </div>
+    </div>
+    <div id="stats"></div>
+  </div>
+</div>
+
+<script src="js/noise.js"></script>
+<script src="js/blocks.js"></script>
+<script src="js/world.js"></script>
+<script src="js/gl.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/main.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
