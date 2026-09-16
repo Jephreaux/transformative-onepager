@@ -424,5 +424,5 @@
     setupInput(); refreshTitle(); $('title').classList.add('open');
     requestAnimationFrame(loop);
   }
-  window.addEventListener('DOMContentLoaded', init);
+  if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', init); else init();
 })();
