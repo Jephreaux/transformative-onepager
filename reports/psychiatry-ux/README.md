@@ -11,9 +11,9 @@
 ## TL;DR: the top 5
 
 1. **The numbers disagree with each other.** The "REMS forms due" tile says **5**, but clicking it filters the list to **2** patients. The summary line says **"0 paused"** while David Johnson's row says **"On pause"**. A coordinator will stop trusting the counts.
-2. **"Next session" dates are in the past.** The drawer's clock reads Sep 26, but every "Next session" is in August (for example Kevin Coleman shows *Next session: Aug 20*). A past date labeled "next" needs to say *Missed / not rebooked*.
+2. **The app has two different "todays".** The demo runs on **Aug 12** (the date picker, "Submitted Aug 12", "REMS sent Aug 12"), but the session entry row prints the real clock ("Sep 26, 4:36 pm"). The stray real timestamp makes every August date look stale. *(Corrected: the first pass called the August next-session dates a bug. They aren't, because they're in the future on the demo clock.)*
 3. **Every overdue item looks the same.** "REMS form · overdue **72d**", "overdue 3d" and "Maintenance PA · 2d" all use the same beige pill. The most important signal on the page, what's on fire, has no color or weight difference.
-4. **You can't open a patient with the keyboard.** Queue rows are `<div>`s with `tabIndex -1`, with no role and no button. Tab skips the whole patient list.
+4. **One-click actions save instantly, with no confirmation and no validation.** "Submit PA" marks the PA submitted immediately. Pressing Enter in the session row logged a session of **−5 minutes with no dose**. Neither shows an undo. *(Corrected: the first pass said rows weren't reachable by keyboard. They are, because a nested button receives Tab focus.)*
 5. **The patient drawer covers the list with no backdrop, and its entry form has no labels.** A bare "120" input, AM/PM and mg toggles, and a stray timestamp ("Sep 26, 2:53:15 pm") sit at the bottom with no heading or save button. Three identical "Mark REMS form sent" buttons don't show which one is actually overdue.
 
 ---
@@ -26,8 +26,8 @@
 |---|---|---|---|
 | H1 | Deadline tiles → list | The tile says **5 REMS forms due**. Clicking it shows *"2 need action · 0 paused · 1 scheduled"* with only 2 REMS rows. | The tile count and the filtered list must use the same query. If the tile counts something different (for example per session instead of per patient), label it that way ("5 forms · 2 patients"). |
 | H2 | Summary line vs rows | *"14 need action · 0 paused · 1 scheduled"*, but David Johnson's phase is **On pause**. | Count paused patients by phase, or rename the phase so the two don't contradict each other. |
-| H3 | Next session column + drawer | Today is Sep 26, but all next sessions are Aug 14–20. | If the date is before today, show **"Missed Aug 20 · rebook"** in clay or red and sort it as needing action. |
-| H4 | Queue rows | `DIV`, no `role`, `tabIndex = -1`. There are 41 buttons in the tab, but no patient row is one of them. | Make each row a `<button>` (the other tabs already use `.queue-row` as a button) or a link, with `aria-label="Open Kevin Coleman"`. |
+| ~~H3~~ | ~~Next session dates in the past~~ | **Withdrawn.** The demo clock is Aug 12, so these dates are upcoming. The real issue is the stray real-time timestamp; see I1. | — |
+| ~~H4~~ | ~~Rows not keyboard reachable~~ | **Withdrawn.** Tab reaches every row through its inner button. | — |
 | H5 | "Next up" pills | Overdue by 72 days, overdue by 3 days, and due in 2 days all share one style. | Use 3 levels. **Overdue** is solid clay with white text, **≤ 7 days** is the accent color, and anything later stays muted. Sort by severity, then by date. |
 
 ### 🟠 Medium
@@ -54,6 +54,41 @@
 | L6 | Phone, row layout | The pill wraps onto its own line next to the date, so row heights vary. | Use a fixed 2-line layout: name + service on line 1, next-up pill + date on line 2. |
 
 ---
+
+---
+
+## Interaction pass (clicking everything)
+Every control on the tab was exercised in headless Chromium. Each claim below is something I observed, not something read from the code.
+
+### What works well ✅
+- **The tiles work as toggles.** Clicking "PA renewals" filters the list to 8 patients (7 need action + 1 scheduled, which matches the tile). Clicking it again clears the filter, and clicking a different tile swaps to that filter.
+- **"Mark REMS form sent" updates everything right away.** It marks the oldest session "REMS sent Aug 12", the tile drops from 5 to 4, and the row pill updates to "overdue 44d".
+- **The drawer is solid to navigate.**
+  - Esc closes it, and so does clicking outside.
+  - Focus moves to the patient's name when it opens.
+  - Clicking another row while it's open swaps to that patient.
+  - There's a "‹ Back to list" button.
+- **Search and chip filters** have a real empty state ("No patients match these filters").
+
+### New problems found
+| # | Sev | Action | What happened | Fix |
+|---|---|---|---|---|
+| I1 | 🔴 | Session entry row | It prints the real clock "Sep 26, 4:36 pm" while the whole app runs on Aug 12. | Remove it, or use the app clock. |
+| I2 | 🔴 | Type −5 in minutes, press Enter | This **logged a session with −5 min and no dose**. There's no validation and no Save button, only Enter. | Require a dose and minutes > 0, add a **Save session** button, and show an undo toast. |
+| I3 | 🔴 | **Submit PA** | One click, and the PA shows "Submitted Aug 12". There's no confirmation, the button disappears, and I saw no undo. | Confirm first ("Submit PA for Kevin Coleman to Medicare?"), or show a 5-second undo toast. |
+| I4 | 🟠 | **Move session** | Nothing visibly happens. The slot picker expands about 500px below the fold, the scroll stays at the top, and focus stays on the button. | Scroll to the picker and move focus to it, or open it in place. |
+| I5 | 🟠 | Move session slots | It says "1.5 chairs free", listing 8 slots that work and then 6 that don't. | Use whole chairs, list only the slots that work (hide the rest behind "show unavailable"), and make slots tappable with a clear selected state. |
+| I6 | 🟠 | **Paused** filter | It shows 0 patients, but David Johnson is "On pause". | This confirms H2. Match the filter to the phase. |
+| I7 | 🟠 | Search "coleman kevin" | No match; only "first last" works. | Match each word separately in any order. Also match the payer and doctor. |
+| I8 | 🟠 | Empty state | It says "Clear a filter chip above", but the cause was the search text and there's no clear button. | Name the active filters and add a **Clear all filters** button. |
+| I9 | 🟡 | Doctor **Novak**, service **Psychiatry**, status **Open call** | Each shows 0 patients. | Hide chips with no results, or show counts on them ("Novak 0"). |
+| I10 | 🟡 | **Show Done (3)** | It adds 3 rows, but the summary line still says "14 · 0 · 1". | Add "3 done" to the summary when Done rows are shown. |
+| I11 | 🟡 | Column headers | Patient, Phase, Next up and Next session sort. **Doctor and Service don't.** Only the active column shows ▲. | Make all columns sortable or none, and show a faint ↕ on the sortable ones. |
+| I12 | 🟡 | The ⓘ next to Chair capacity | It's a button with **no accessible name**, so screen readers just say "button". | `aria-label="How chair capacity is calculated"` |
+| I13 | 🟡 | Minutes field | It has only placeholder text, no label. The drawer also has a heading **"Log a call" and a button "Log a call"** next to each other. | Label the field and rename one of the two. |
+| I14 | 🟡 | Drawer | It's an `<aside>` with no `role="dialog"` or `aria-modal`. | Add them; focus management is already there. |
+| I15 | 🟡 | "Eligibility checked today" | It's a single-tap button that records a fact, while the summary above says "Never checked". | Confirm it, or show the date after tapping. |
+
 
 ---
 
@@ -102,9 +137,10 @@ The palette (moss, sage, clay, gold) and the serif and sans pairing are good and
 
 ## Quick wins (under an hour each)
 - [ ] Make tile counts and filtered list counts come from the same selector (H1, H2).
-- [ ] Past "next session" dates show as **Missed** (H3).
+- [ ] Remove the stray real-clock timestamp (I1).
+- [ ] Validate the session row and add Save and undo (I2), and add confirm or undo to Submit PA (I3).
 - [ ] Give overdue pills a clay or red style (H5).
-- [ ] Make rows `<button>`s (H4).
+- [ ] Make Move session scroll to and focus its picker (I4).
 - [ ] Label the session-entry inputs and add a Save button (M2).
 - [ ] Rename "Freed chair?" to "Fill an open chair", and "Select all" to "All" (M6, M7).
 
@@ -119,6 +155,8 @@ The palette (moss, sage, clay, gold) and the serif and sans pairing are good and
 | Zoom: top band | ![](06-zoom-top.png) |
 | Zoom: rows | ![](07-zoom-rows.png) |
 | Zoom: drawer | ![](08-zoom-drawer.png) |
+| Empty state | ![](09-empty-state.png) |
+| After Mark REMS sent | ![](10-after-rems-sent.png) |
 
 ## Not checked
 - Color contrast was judged by eye and not measured.
