@@ -55,6 +55,51 @@
 
 ---
 
+---
+
+## Visual review (layout, type, color, spacing)
+Based on 2× crops: `06-zoom-top.png`, `07-zoom-rows.png` and `08-zoom-drawer.png`.
+
+### Top band (deadline tiles and chair capacity)
+- **The tiles are mostly empty space.** Each one is about 170px tall with a small number and label floating in it. The numbers also sit at **different heights**: 5, 3 and 2 ride higher than 8 and 1 because their labels wrap onto two lines. Anchor the number and label to the top-left, or put them on one line, and cut the tile height by about half.
+- **The gold numbers are low-contrast and their meaning is unclear.** The same gold (`--accent`) is used for the counts, the "Next up" pills and the focus ring. Pick one job for it: use it for urgency, or don't use it at all.
+- **The corners don't match.** The tiles have 8px rounded corners but sit inside a square card (`--radius-card: 0`), next to pill-shaped chips. Choose one radius per level.
+- **The tiles are clickable buttons but look like static boxes.** They need a hover and pressed state, and a selected state when they're filtering the list.
+- **The hierarchy is inverted.** "Deadlines" and "Chair capacity" are small serif titles, while the filter labels "Doctor" and "Status" below them are larger and darker. Section titles should outrank filter labels.
+- **The capacity card is grey text on grey.** The explanation lines are too pale to read comfortably, and the "9.3" is the loudest thing on the page for the least actionable number.
+
+### Filter area
+- **The filters are scattered.** Doctor sits at the left edge, Service at the right edge, "Freed chair?" floats alone, and the search box lines up with neither column. It reads as four separate islands. Put them in one row or bar: search, then Doctor, Service and Status as dropdowns.
+- **The default state gets the heaviest ink on the page.** Three solid dark "Select all" pills stand out most, but they show that *nothing* is filtered. Make the default quiet and the active filter loud.
+
+### Queue rows
+- **Text overlaps.** The "Maintenance PA · overdue 5d" pill runs into "Aug 14, 2026". The column is too narrow for the longest pill. Give the column a minimum width or let the pill truncate with a tooltip.
+- **The phase text wraps awkwardly.** "Maintenance · wk" / "12" splits across two lines. Keep "wk 12" together with a non-breaking space, or show the week as a small second line.
+- **About 30% of each row's width is empty.** Everything after the Service pill is blank white. Widen Patient and Next up, or narrow the container.
+- **The Service pill looks like a button.** It's an outlined, bold pill, but it isn't clickable. Use a flat tag or a colored dot.
+- **The column headers are almost invisible.** They're 11px pale grey. Darken them a step.
+- **Rows are hard to scan.** Every row carries the same weight and the grey gaps between them are thick. Try tighter rows with hairline dividers, and a clay-colored left edge on overdue rows.
+
+### Patient drawer
+- **The hierarchy is flipped here too.** The patient's name is a thin serif, and the bold sans "Next session: Aug 20, 2026 · AM" under it overpowers it. The name should be the anchor.
+- **The same facts appear twice.** The subtitle "Spravato · Medicare · Lindqvist · Maintenance · wk 12" is repeated in the uppercase chip "SPRAVATO · MAINTENANCE · WK 12 · MEDICARE". Drop the chip.
+- **The stat grid is uneven.**
+  - The values sit at different heights: "Expired 42d ago" is higher than "2 of 12 devices" and "Never checked".
+  - The second row has only 2 of 4 cells filled, leaving a hole.
+  - "Next session" is repeated a third time.
+  - Fix: top-align all the values and use a 3-column grid without the repeat.
+- **The label color is too pale.** The uppercase, letter-spaced labels (PRIOR AUTH and the others) are too light, and "23 days ago" in grey looks disabled.
+- **Red is used for three different kinds of problem.** Expired PA, never checked and the REMS form are all the same red, so nothing is ranked. Keep solid red for the one blocking item.
+- **The session entry row looks broken.**
+  - The AM/PM and mg toggles are fused into the "120" input as one long pill.
+  - The date box has a different width and height from everything else.
+  - A bold timestamp floats between them.
+  - Fix: separate the fields with labels and give them consistent heights.
+- **The drawer bottom is cut off.** The list rows bleed through under the drawer's bottom edge. The drawer needs full height or its own scroll area, with a solid footer.
+
+### Overall
+The palette (moss, sage, clay, gold) and the serif and sans pairing are good and on-brand. The problems are consistency (radius, weight, where color is used) and hierarchy (loud defaults, quiet urgencies). Fix those and it will look noticeably more polished without a redesign.
+
 ## Quick wins (under an hour each)
 - [ ] Make tile counts and filtered list counts come from the same selector (H1, H2).
 - [ ] Past "next session" dates show as **Missed** (H3).
@@ -71,6 +116,9 @@
 | Freed-chair panel | ![](03-freed-chair.png) |
 | Phone, top | ![](04-mobile-top.png) |
 | Phone, list | ![](05-mobile-list.png) |
+| Zoom: top band | ![](06-zoom-top.png) |
+| Zoom: rows | ![](07-zoom-rows.png) |
+| Zoom: drawer | ![](08-zoom-drawer.png) |
 
 ## Not checked
 - Color contrast was judged by eye and not measured.
